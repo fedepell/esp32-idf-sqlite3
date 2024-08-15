@@ -1,6 +1,6 @@
 set(COMPONENT_ADD_INCLUDEDIRS "include")
 
-idf_component_register(SRCS "sqlite3.c" "esp32.c" "shox96_0_2.c"
+idf_component_register(SRCS "sqlite3.c" "esp32.c"
                        INCLUDE_DIRS "include"
                        PRIV_INCLUDE_DIRS "private_include"
                        REQUIRES mbedtls
