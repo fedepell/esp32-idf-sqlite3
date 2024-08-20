@@ -401,6 +401,7 @@ int esp32_Read(sqlite3_file *id, void *buffer, int amount, sqlite3_int64 offset)
 	ofst = fseek(file->fd, iofst, SEEK_SET);
 	if (ofst != 0) {
 	    dbg_printf("esp32_Read: 2r %d != %d FAIL\n", ofst, iofst);
+		memset(buffer, 0, amount);
 		return SQLITE_IOERR_SHORT_READ /* SQLITE_IOERR_SEEK */;
 	}
 
@@ -408,8 +409,9 @@ int esp32_Read(sqlite3_file *id, void *buffer, int amount, sqlite3_int64 offset)
 	if ( nRead == amount ) {
 	    dbg_printf("esp32_Read: 3r %s %u %d OK\n", file->name, nRead, amount);
 		return SQLITE_OK;
-	} else if ( nRead >= 0 ) {
+	} else if ( nRead < amount ) {
 	    dbg_printf("esp32_Read: 3r %s %u %d FAIL\n", file->name, nRead, amount);
+		memset((uint8_t *)(buffer) + nRead, 0, amount - nRead);
 		return SQLITE_IOERR_SHORT_READ;
 	}
 
