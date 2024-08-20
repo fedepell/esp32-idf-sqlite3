@@ -4,7 +4,6 @@
 #define YYSTACKDEPTH                        20
 #define SQLITE_TEMP_STORE                    1
 #define SQLITE_SYSTEM_MALLOC                 1
-#define SQLITE_OS_OTHER                      1
 #define SQLITE_THREADSAFE                    0
 #define SQLITE_MUTEX_APPDEF                  1
 #define SQLITE_SECURE_DELETE                 0
@@ -83,3 +82,10 @@
 /* #define SQLITE_OMIT_DATETIME_FUNCS        1 */
 /* #define SQLITE_OMIT_FLOATING_POINT        1 */
 
+
+// ESP32 Specific configuration for SQLite.
+// Under an ARCHDEFINE to be able to compile
+// on different archs (unix) to make testing easier.
+#ifdef ESP32
+  #define SQLITE_OS_OTHER                    1
+#endif // ESP32
