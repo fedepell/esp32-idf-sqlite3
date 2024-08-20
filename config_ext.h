@@ -74,7 +74,6 @@
 #undef SQLITE_OMIT_VACUUM
 #undef SQLITE_OMIT_VIEW
 #undef SQLITE_OMIT_VIRTUALTABLE
-#define SQLITE_OMIT_WAL                      1
 #undef SQLITE_OMIT_WSD
 #define SQLITE_OMIT_XFER_OPT                 1
 /* #define SQLITE_OMIT_COMPLETE              1 */
@@ -82,6 +81,7 @@
 /* #define SQLITE_OMIT_DATETIME_FUNCS        1 */
 /* #define SQLITE_OMIT_FLOATING_POINT        1 */
 
+#define SQLITE_DEFAULT_SYNCHRONOUS           1 // 2 => 1 slightly less safe, but should be enough together with WAL.
 
 // ESP32 Specific configuration for SQLite.
 // Under an ARCHDEFINE to be able to compile
