@@ -92,7 +92,11 @@ sqlite3_vfs  esp32Vfs = {
 	esp32_Randomness,	// xRandomness
 	esp32_Sleep,		// xSleep
 	esp32_CurrentTime,	// xCurrentTime
-	0			// xGetLastError
+	0,			// xGetLastError
+	0,			// xCurrentTimeInt64
+	0,			// xSetSystemCall
+	0,			// xGetSystemCall
+	0,			// xNextSystemCall
 };
 
 const sqlite3_io_methods esp32IoMethods = {
@@ -108,7 +112,13 @@ const sqlite3_io_methods esp32IoMethods = {
 	esp32_CheckReservedLock,
 	esp32_FileControl,
 	esp32_SectorSize,
-	esp32_DeviceCharacteristics
+	esp32_DeviceCharacteristics,
+	0, // xShmMap
+	0, // xShmLock
+	0, // xShmBarrier
+	0, // xShmUnmap
+	0, // xFetch
+	0  // xUnfetch
 };
 
 const sqlite3_io_methods esp32MemMethods = {
@@ -124,7 +134,13 @@ const sqlite3_io_methods esp32MemMethods = {
 	esp32_CheckReservedLock,
 	esp32_FileControl,
 	esp32_SectorSize,
-	esp32_DeviceCharacteristics
+	esp32_DeviceCharacteristics,
+	0, // xShmMap
+	0, // xShmLock
+	0, // xShmBarrier
+	0, // xShmUnmap
+	0, // xFetch
+	0  // xUnfetch
 };
 
 uint32_t linkedlist_store (linkedlist_t **leaf, uint32_t offset, uint32_t len, const uint8_t *data) {
