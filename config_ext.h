@@ -2,7 +2,7 @@
 #define SQLITE_CORE                          1
 #define SQLITE_NO_SYNC                       1
 #define YYSTACKDEPTH                        20
-#define SQLITE_TEMP_STORE                    1
+#define SQLITE_TEMP_STORE                    3 // 1 => 3 only use memory
 #define SQLITE_SYSTEM_MALLOC                 1
 #define SQLITE_THREADSAFE                    0
 #define SQLITE_MUTEX_APPDEF                  1
@@ -81,6 +81,9 @@
 /* #define SQLITE_OMIT_DATETIME_FUNCS        1 */
 /* #define SQLITE_OMIT_FLOATING_POINT        1 */
 
+#define SQLITE_ENABLE_NULL_TRIM              1
+#define SQLITE_ENABLE_PREUPDATE_HOOK         1 // This may be interesting to implement the update logic
+#define SQLITE_DQS                           0
 #define SQLITE_DEFAULT_SYNCHRONOUS           1 // 2 => 1 slightly less safe, but should be enough together with WAL.
 
 // ESP32 Specific configuration for SQLite.
