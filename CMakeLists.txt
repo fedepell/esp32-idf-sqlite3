@@ -6,4 +6,30 @@ idf_component_register(SRCS "sqlite3.c" "esp32.c"
                        REQUIRES mbedtls
                        PRIV_REQUIRES console spi_flash)
 
-target_compile_options(${COMPONENT_LIB} PRIVATE -std=gnu99 -g3 -fno-stack-protector -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -mlongcalls -nostdlib -Wpointer-arith -Wno-error=unused-value -Wno-error=unused-label -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-error=char-subscripts -Wno-error=maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-old-style-declaration -MMD -c -DF_CPU=240000000L -DESP32 -DCORE_DEBUG_LEVEL=0 -DNDEBUG)
+target_compile_options(${COMPONENT_LIB} PRIVATE
+    -std=gnu99
+    -Wall
+    -Wno-error=unused-value
+    -Wno-error=unused-label
+    -Wno-error=unused-function
+    -Wno-error=unused-but-set-variable
+    -Wno-error=deprecated-declarations
+    -Wno-error=char-subscripts
+    -Wno-error=unused-variable
+    -Wno-error=maybe-uninitialized
+    -MMD
+    -c
+    -DESP32
+    -DNDEBUG
+  )
+
+    # =============================
+    # @TODO  Double check these
+    # eventually remove or restore
+    # before merging!!
+    # =============================
+
+    # -fno-stack-protector
+    # -fstrict-volatile-bitfields
+    # -mlongcalls
+    # -nostdlib
