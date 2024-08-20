@@ -81,6 +81,11 @@
 /* #define SQLITE_OMIT_DATETIME_FUNCS        1 */
 /* #define SQLITE_OMIT_FLOATING_POINT        1 */
 
+#define SQLITE_OMIT_JSON                     1
+#define SQLITE_OMIT_INTROSPECTION_PRAGMAS    1
+#define SQLITE_OMIT_COMPLETE                 1
+#define SQLITE_OMIT_DESERIALIZE              1
+#define SQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS 1
 #define SQLITE_ENABLE_NULL_TRIM              1
 #define SQLITE_ENABLE_PREUPDATE_HOOK         1 // This may be interesting to implement the update logic
 #define SQLITE_DQS                           0
