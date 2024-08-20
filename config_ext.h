@@ -37,12 +37,9 @@
 #define SQLITE_OMIT_AUTOVACUUM               1
 #undef SQLITE_OMIT_BETWEEN_OPTIMIZATION
 #define SQLITE_OMIT_BLOB_LITERAL             1
-#define SQLITE_OMIT_BTREECOUNT               1
-#define SQLITE_OMIT_BUILTIN_TEST             1
-#define SQLITE_OMIT_CAST                     1
+#define SQLITE_UNTESTABLE                    1
 #define SQLITE_OMIT_CHECK                    1
 #define SQLITE_OMIT_COMPILEOPTION_DIAGS      1
-#define SQLITE_OMIT_COMPOUND_SELECT          1
 #define SQLITE_OMIT_CONFLICT_CLAUSE          1
 #undef SQLITE_OMIT_CTE
 #define SQLITE_OMIT_DECLTYPE                 1
@@ -81,9 +78,8 @@
 #define SQLITE_OMIT_WAL                      1
 #undef SQLITE_OMIT_WSD
 #define SQLITE_OMIT_XFER_OPT                 1
-#define SQLITE_PERFORMANCE_TRACE             1
 /* #define SQLITE_OMIT_COMPLETE              1 */
 /* #define SQLITE_OMIT_SUBQUERY              1 */
 /* #define SQLITE_OMIT_DATETIME_FUNCS        1 */
 /* #define SQLITE_OMIT_FLOATING_POINT        1 */
-#define SQLITE_COUNTOFVIEW_OPTIMIZATION      0
+
