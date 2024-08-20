@@ -26,33 +26,6 @@
 #define CACHEBLOCKSZ 64
 #define esp32_DEFAULT_MAXNAMESIZE 100
 
-// From https://stackoverflow.com/questions/19758270/read-varint-from-linux-sockets#19760246
-// Encode an unsigned 64-bit varint.  Returns number of encoded bytes.
-// 'buffer' must have room for up to 10 bytes.
-int encode_unsigned_varint(uint8_t *buffer, uint64_t value) {
-	int encoded = 0;
-	do {
-		uint8_t next_byte = value & 0x7F;
-		value >>= 7;
-		if (value)
-			next_byte |= 0x80;
-		buffer[encoded++] = next_byte;
-	} while (value);
-	return encoded;
-}
-
-uint64_t decode_unsigned_varint(const uint8_t *data, int *decoded_bytes) {
-	int i = 0;
-	uint64_t decoded_value = 0;
-	int shift_amount = 0;
-	do {
-		decoded_value |= (uint64_t)(data[i] & 0x7F) << shift_amount;     
-		shift_amount += 7;
-	} while ((data[i++] & 0x80) != 0);
-	*decoded_bytes = i;
-	return decoded_value;
-}
-
 int esp32_Close(sqlite3_file*);
 int esp32_Lock(sqlite3_file *, int);
 int esp32_Unlock(sqlite3_file*, int);
