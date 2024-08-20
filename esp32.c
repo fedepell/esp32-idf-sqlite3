@@ -371,7 +371,7 @@ int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int f
 	}
 
 	p->fd = fopen(path, mode);
-    if ( p->fd <= 0 ) {
+	if (!p->fd) {
 		return SQLITE_CANTOPEN;
 	}
 
