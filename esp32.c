@@ -340,23 +340,18 @@ int esp32mem_FileSize(sqlite3_file *id, sqlite3_int64 *size)
 int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int flags, int * outflags )
 {
 	int rc;
-	char mode[5];
 	esp32_file *p = (esp32_file*) file;
+	const char *mode = "r";
 
-	strcpy(mode, "r");
 	if ( path == NULL ) return SQLITE_IOERR;
 	dbg_printf("esp32_Open: 0o %s %s\n", path, mode);
-	if( flags&SQLITE_OPEN_READONLY ) 
-		strcpy(mode, "r");
+
 	if( flags&SQLITE_OPEN_READWRITE || flags&SQLITE_OPEN_MAIN_JOURNAL ) {
 		int result;
 		if (SQLITE_OK != esp32_Access(vfs, path, flags, &result))
 			return SQLITE_CANTOPEN;
 
-		if (result == 1)
-            strcpy(mode, "r+");
-		else
-            strcpy(mode, "w+");
+		mode = (result == 1) ? "r+" : "w+";
 	}
 
 	dbg_printf("esp32_Open: 1o %s %s\n", path, mode);
