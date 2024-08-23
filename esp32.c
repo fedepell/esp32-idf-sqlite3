@@ -75,72 +75,72 @@ typedef struct esp32_file {
 } esp32_file;
 
 sqlite3_vfs  esp32Vfs = {
-	1,			// iVersion
-	sizeof(esp32_file),	// szOsFile
-	101,	// mxPathname
-	NULL,			// pNext
-	"esp32",		// name
-	0,			// pAppData
-	esp32_Open,		// xOpen
-	esp32_Delete,		// xDelete
-	esp32_Access,		// xAccess
-	esp32_FullPathname,	// xFullPathname
-	esp32_DlOpen,		// xDlOpen
-	esp32_DlError,	// xDlError
-	esp32_DlSym,		// xDlSym
-	esp32_DlClose,	// xDlClose
-	esp32_Randomness,	// xRandomness
-	esp32_Sleep,		// xSleep
-	esp32_CurrentTime,	// xCurrentTime
-	0,			// xGetLastError
-	0,			// xCurrentTimeInt64
-	0,			// xSetSystemCall
-	0,			// xGetSystemCall
-	0,			// xNextSystemCall
+	.iVersion          = 1,
+	.szOsFile          = sizeof(esp32_file),
+	.mxPathname        = 101,
+	.pNext             = NULL,
+	.zName             = "esp32",
+	.pAppData          = 0,
+	.xOpen             = esp32_Open,
+	.xDelete           = esp32_Delete,
+	.xAccess           = esp32_Access,
+	.xFullPathname     = esp32_FullPathname,
+	.xDlOpen           = esp32_DlOpen,
+	.xDlError          = esp32_DlError,
+	.xDlSym            = esp32_DlSym,
+	.xDlClose          = esp32_DlClose,
+	.xRandomness       = esp32_Randomness,
+	.xSleep            = esp32_Sleep,
+	.xCurrentTime      = esp32_CurrentTime,
+	.xGetLastError     = 0,
+	.xCurrentTimeInt64 = 0,
+	.xSetSystemCall    = 0,
+	.xGetSystemCall    = 0,
+	.xNextSystemCall   = 0,
 };
 
 const sqlite3_io_methods esp32IoMethods = {
-	1,
-	esp32_Close,
-	esp32_Read,
-	esp32_Write,
-	esp32_Truncate,
-	esp32_Sync,
-	esp32_FileSize,
-	esp32_Lock,
-	esp32_Unlock,
-	esp32_CheckReservedLock,
-	esp32_FileControl,
-	esp32_SectorSize,
-	esp32_DeviceCharacteristics,
-	0, // xShmMap
-	0, // xShmLock
-	0, // xShmBarrier
-	0, // xShmUnmap
-	0, // xFetch
-	0  // xUnfetch
+	.iVersion                 = 1,
+	.xClose                   = esp32_Close,
+	.xRead                    = esp32_Read,
+	.xWrite                   = esp32_Write,
+	.xTruncate                = esp32_Truncate,
+	.xSync                    = esp32_Sync,
+	.xFileSize                = esp32_FileSize,
+	.xLock                    = esp32_Lock,
+	.xUnlock                  = esp32_Unlock,
+	.xCheckReservedLock       = esp32_CheckReservedLock,
+	.xFileControl             = esp32_FileControl,
+	.xSectorSize              = esp32_SectorSize,
+	.xDeviceCharacteristics   = esp32_DeviceCharacteristics,
+	.xShmMap                  = 0,
+	.xShmLock                 = 0,
+	.xShmBarrier              = 0,
+	.xShmUnmap                = 0,
+	.xFetch                   = 0,
+	.xUnfetch                 = 0
 };
 
 const sqlite3_io_methods esp32MemMethods = {
-	1,
-	esp32mem_Close,
-	esp32mem_Read,
-	esp32mem_Write,
-	esp32_Truncate,
-	esp32mem_Sync,
-	esp32mem_FileSize,
-	esp32_Lock,
-	esp32_Unlock,
-	esp32_CheckReservedLock,
-	esp32_FileControl,
-	esp32_SectorSize,
-	esp32_DeviceCharacteristics,
-	0, // xShmMap
-	0, // xShmLock
-	0, // xShmBarrier
-	0, // xShmUnmap
-	0, // xFetch
-	0  // xUnfetch
+	.iVersion                = 1,
+	.xClose                   = esp32mem_Close,
+	.xRead                    = esp32mem_Read,
+	.xWrite                   = esp32mem_Write,
+	.xTruncate                = esp32_Truncate,
+	.xSync                    = esp32mem_Sync,
+	.xFileSize                = esp32mem_FileSize,
+	.xLock                    = esp32_Lock,
+	.xUnlock                  = esp32_Unlock,
+	.xCheckReservedLock       = esp32_CheckReservedLock,
+	.xFileControl             = esp32_FileControl,
+	.xSectorSize              = esp32_SectorSize,
+	.xDeviceCharacteristics   = esp32_DeviceCharacteristics,
+	.xShmMap                 = 0,
+	.xShmLock                = 0,
+	.xShmBarrier             = 0,
+	.xShmUnmap               = 0,
+	.xFetch                  = 0,
+	.xUnfetch                = 0
 };
 
 uint32_t linkedlist_store (linkedlist_t **leaf, uint32_t offset, uint32_t len, const uint8_t *data) {
