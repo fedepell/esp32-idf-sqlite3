@@ -4,7 +4,7 @@ idf_component_register(SRCS "sqlite3.c" "esp32.c"
                        INCLUDE_DIRS "include"
                        PRIV_INCLUDE_DIRS "private_include"
                        REQUIRES mbedtls
-                       PRIV_REQUIRES console spi_flash)
+                       PRIV_REQUIRES console spi_flash esp_timer)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE
     -std=gnu99
