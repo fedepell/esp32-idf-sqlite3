@@ -7,6 +7,12 @@
  * https://github.com/nodemcu/nodemcu-firmware/blob/master/app/sqlite3/esp8266.c
  **/
 
+/**
+ * Define this to enable some basic I/O statistics.
+ * Useful for debugging only, do not use in production.
+ */
+#define DEBUG_IO_STATS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +23,6 @@
 #include <spi_flash_mmap.h>
 #include <esp_system.h>
 #include <esp_random.h>
-#include <esp_timer.h>
 #include <rom/ets_sys.h>
 #include <sys/stat.h>
 
@@ -26,12 +31,6 @@
 #define dbg_printf(...) 
 #define CACHEBLOCKSZ 64
 #define esp32_DEFAULT_MAXNAMESIZE 100
-
-/**
- * Define this to enable some basic I/O statistics.
- * Useful for debugging only, do not use in production.
- */
-// #define DEBUG_IO_STATS
 
 int esp32_Close(sqlite3_file*);
 int esp32_Lock(sqlite3_file *, int);
@@ -58,6 +57,8 @@ int esp32_Sleep(sqlite3_vfs*, int);
 int esp32_CurrentTime(sqlite3_vfs*, double*);
 
 #ifdef DEBUG_IO_STATS
+#include <esp_timer.h>
+
 int esp32_Read_Stats(sqlite3_file*, void*, int, sqlite3_int64);
 int esp32_Write_Stats(sqlite3_file*, const void*, int, sqlite3_int64);
 int esp32_Sync_Stats(sqlite3_file*, int);
@@ -139,7 +140,7 @@ const sqlite3_io_methods esp32IoMethods = {
 	.iVersion                 = 1,
 	.xClose                   = esp32_Close,
 	#ifdef DEBUG_IO_STATS
-		.xRead                  = esp32_Read,
+		.xRead                  = esp32_Read_Stats,
 		.xWrite                 = esp32_Write_Stats,
 		.xSync                  = esp32_Sync_Stats,
 	#else
@@ -703,9 +704,9 @@ int esp32_CurrentTime( sqlite3_vfs * vfs, double * result )
 		file->stats.read_elapsed_us += esp_timer_get_time() - start;
 
 		if (rc == SQLITE_OK) {
-			file->stats.read_failed++;
-		} else {
 			file->stats.read_bytes += amount;
+		} else {
+			file->stats.read_failed++;
 		}
 		return rc;
 	}

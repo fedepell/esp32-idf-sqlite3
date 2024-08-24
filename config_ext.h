@@ -87,7 +87,6 @@
 #define SQLITE_OMIT_DESERIALIZE              1
 #define SQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS 1
 #define SQLITE_ENABLE_NULL_TRIM              1
-#define SQLITE_ENABLE_PREUPDATE_HOOK         1 // This may be interesting to implement the update logic
 #define SQLITE_DQS                           0
 #define SQLITE_DEFAULT_SYNCHRONOUS           1 // 2 => 1 slightly less safe, but should be enough together with WAL.
 
