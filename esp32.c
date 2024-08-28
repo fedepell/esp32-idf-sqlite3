@@ -62,6 +62,8 @@ int esp32_CurrentTime(sqlite3_vfs*, double*);
 int esp32_Read_Stats(sqlite3_file*, void*, int, sqlite3_int64);
 int esp32_Write_Stats(sqlite3_file*, const void*, int, sqlite3_int64);
 int esp32_Sync_Stats(sqlite3_file*, int);
+int esp32mem_Read_Stats(sqlite3_file*, void*, int, sqlite3_int64);
+int esp32mem_Write_Stats(sqlite3_file*, const void*, int, sqlite3_int64);
 #endif // DEBUG_IO_STATS
 
 int esp32mem_Close(sqlite3_file*);
@@ -102,6 +104,20 @@ typedef struct esp32_file {
 			uint32_t read_bytes;
 			uint32_t read_bytes_max;
 			uint32_t read_bytes_min;
+
+			uint32_t r_mem_cnt;
+			uint32_t r_mem_failed;
+			int64_t  r_mem_elapsed_us;
+			uint32_t r_mem_bytes;
+			uint32_t r_mem_bytes_max;
+			uint32_t r_mem_bytes_min;
+
+			uint32_t w_mem_cnt;
+			uint32_t w_mem_failed;
+			int64_t  w_mem_elapsed_us;
+			uint32_t w_mem_bytes;
+			uint32_t w_mem_bytes_max;
+			uint32_t w_mem_bytes_min;
 
 			uint32_t sync_cnt;
 			uint32_t sync_failed;
@@ -443,19 +459,34 @@ int esp32_Close(sqlite3_file *id)
 		float read_ratio = read_succ * 100 / (float) file->stats.read_cnt;
 
 		uint32_t sync_succ = file->stats.sync_cnt - file->stats.sync_failed;
-		float sync_ratio = sync_succ / (float) file->stats.sync_cnt;
+		float sync_ratio = sync_succ * 100 / (float) file->stats.sync_cnt;
+
+		uint32_t r_mem_succ = file->stats.r_mem_cnt - file->stats.r_mem_failed;
+		float r_mem_ratio = r_mem_succ * 100 / (float) file->stats.r_mem_cnt;
+
+		uint32_t w_mem_succ = file->stats.w_mem_cnt - file->stats.w_mem_failed;
+		float w_mem_ratio = w_mem_succ * 100 / (float) file->stats.w_mem_cnt;
+
 		printf("esp32_Close: IO-STATS '%s'\n"
-					 "  syncs      = %6.2f %% %4lu F / %4lu T - %9lld us (avg: %6lld us)\n"
-					 "  writes     = %6.2f %% %4lu F / %4lu T - %9lld us (avg: %6lld us)\n"
-					 "  reads      = %6.2f %% %4lu F / %4lu T - %9lld us (avg: %6lld us)\n"
+					 "  syncs      = %6.2f %% %4lu / %4lu - %9lld us (avg: %6lld us)\n"
+					 "  writes     = %6.2f %% %4lu / %4lu - %9lld us (avg: %6lld us)\n"
+					 "  reads      = %6.2f %% %4lu / %4lu - %9lld us (avg: %6lld us)\n"
+					 "  mem writes = %6.2f %% %4lu / %4lu - %9lld us (avg: %6lld us)\n"
+					 "  mem reads  = %6.2f %% %4lu / %4lu - %9lld us (avg: %6lld us)\n"
 					 "  W Bytes    = Tot: %9lu B (min: %4lu, max: %4lu)\n"
-					 "  R Bytes    = Tot: %9lu B (min: %4lu, max: %4lu)\n",
+					 "  R Bytes    = Tot: %9lu B (min: %4lu, max: %4lu)\n"
+					 "  mem WB		 = Tot: %9lu B (min: %4lu)\n"
+					 "  mem RB		 = Tot: %9lu B (min: %4lu)\n",
 					 file->name,
-					 sync_ratio, sync_succ,  file->stats.sync_cnt,       file->stats.sync_elapsed_us, (file->stats.sync_elapsed_us / file->stats.sync_cnt),
-					 wrt_ratio,  wrt_succ,   file->stats.wrt_cnt,        file->stats.wrt_elapsed_us,  (file->stats.wrt_elapsed_us / file->stats.wrt_cnt),
-					 read_ratio, read_succ,  file->stats.read_cnt,       file->stats.read_elapsed_us, (file->stats.read_elapsed_us / file->stats.read_cnt),
-					 file->stats.wrt_bytes,  file->stats.wrt_bytes_min,  file->stats.wrt_bytes_max,
-					 file->stats.read_bytes, file->stats.read_bytes_min, file->stats.read_bytes_max
+					 sync_ratio, sync_succ,   file->stats.sync_cnt,       file->stats.sync_elapsed_us,  (file->stats.sync_elapsed_us  / file->stats.sync_cnt),
+					 wrt_ratio,  wrt_succ,    file->stats.wrt_cnt,        file->stats.wrt_elapsed_us,   (file->stats.wrt_elapsed_us   / file->stats.wrt_cnt),
+					 read_ratio, read_succ,   file->stats.read_cnt,       file->stats.read_elapsed_us,  (file->stats.read_elapsed_us  / file->stats.read_cnt),
+					 w_mem_ratio, w_mem_succ, file->stats.w_mem_cnt,      file->stats.w_mem_elapsed_us, (file->stats.w_mem_elapsed_us / file->stats.w_mem_cnt),
+					 r_mem_ratio, r_mem_succ, file->stats.r_mem_cnt,      file->stats.r_mem_elapsed_us, (file->stats.r_mem_elapsed_us / file->stats.r_mem_cnt),
+					 file->stats.wrt_bytes,   file->stats.wrt_bytes_min,  file->stats.wrt_bytes_max,
+					 file->stats.read_bytes,  file->stats.read_bytes_min, file->stats.read_bytes_max,
+					 file->stats.w_mem_bytes, file->stats.w_mem_bytes_min,
+					 file->stats.r_mem_bytes, file->stats.r_mem_bytes_min
 					);
 	#endif // DEBUG_IO_STATS
 
@@ -744,6 +775,52 @@ int esp32_CurrentTime( sqlite3_vfs * vfs, double * result )
 
 		if (rc != SQLITE_OK) {
 			file->stats.sync_failed++;
+		}
+		return rc;
+	}
+
+	int esp32mem_Read_Stats(sqlite3_file *id, void *buffer, int amount, sqlite3_int64 offset) {
+		esp32_file *file = (esp32_file*) id;
+		file->stats.r_mem_cnt++;
+
+		if (file->stats.r_mem_bytes_min > amount) {
+			file->stats.r_mem_bytes_min = amount;
+		}
+		if (file->stats.r_mem_bytes_max < amount) {
+			file->stats.r_mem_bytes_max = amount;
+		}
+
+		int64_t start = esp_timer_get_time();
+		int rc = esp32mem_Read(id, buffer, amount, offset);
+		file->stats.r_mem_elapsed_us += esp_timer_get_time() - start;
+
+		if (rc == SQLITE_OK) {
+			file->stats.r_mem_bytes += amount;
+		} else {
+			file->stats.r_mem_failed++;
+		}
+		return rc;
+	}
+
+	int esp32mem_Write_Stats(sqlite3_file *id, const void *buffer, int amount, sqlite3_int64 offset) {
+		esp32_file *file = (esp32_file*) id;
+		file->stats.w_mem_cnt++;
+
+		if (file->stats.w_mem_bytes_min > amount) {
+			file->stats.w_mem_bytes_min = amount;
+		}
+		if (file->stats.w_mem_bytes_max < amount) {
+			file->stats.w_mem_bytes_max = amount;
+		}
+
+		int64_t start = esp_timer_get_time();
+		int rc = esp32mem_Write(id, buffer, amount, offset);
+		file->stats.w_mem_elapsed_us += esp_timer_get_time() - start;
+
+		if (rc == SQLITE_OK) {
+			file->stats.w_mem_bytes += amount;
+		} else {
+			file->stats.w_mem_failed++;
 		}
 		return rc;
 	}
