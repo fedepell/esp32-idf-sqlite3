@@ -347,7 +347,7 @@ int esp32mem_Read(sqlite3_file *id, void *buffer, int amount, sqlite3_int64 offs
 
 	filecache_pull (file->cache, ofst, amount, (uint8_t *) buffer);
 
-	dbg_printf("esp32mem_Read: %s [%d] [%d] OK\n", file->name, ofst, amount);
+	dbg_printf("esp32mem_Read: %s [%ld] [%d] OK\n", file->name, ofst, amount);
 	return SQLITE_OK;
 }
 
@@ -360,7 +360,7 @@ int esp32mem_Write(sqlite3_file *id, const void *buffer, int amount, sqlite3_int
 
 	filecache_push (file->cache, ofst, amount, (const uint8_t *) buffer);
 
-	dbg_printf("esp32mem_Write: %s [%d] [%d] OK\n", file->name, ofst, amount);
+	dbg_printf("esp32mem_Write: %s [%ld] [%d] OK\n", file->name, ofst, amount);
 	return SQLITE_OK;
 }
 
@@ -375,7 +375,7 @@ int esp32mem_FileSize(sqlite3_file *id, sqlite3_int64 *size)
 	esp32_file *file = (esp32_file*) id;
 
 	*size = 0LL | file->cache->size;
-	dbg_printf("esp32mem_FileSize: %s [%d] OK\n", file->name, file->cache->size);
+	dbg_printf("esp32mem_FileSize: %s [%ld] OK\n", file->name, file->cache->size);
 	return SQLITE_OK;
 }
 
@@ -437,19 +437,19 @@ int esp32_Close(sqlite3_file *id)
 
 	#ifdef DEBUG_IO_STATS
 		uint32_t wrt_succ = file->stats.wrt_cnt - file->stats.wrt_failed;
-		float wrt_ratio = wrt_succ / (float) file->stats.wrt_cnt;
+		float wrt_ratio = wrt_succ * 100 / (float) file->stats.wrt_cnt;
 
 		uint32_t read_succ = file->stats.read_cnt - file->stats.read_failed;
-		float read_ratio = read_succ / (float) file->stats.read_cnt;
+		float read_ratio = read_succ * 100 / (float) file->stats.read_cnt;
 
 		uint32_t sync_succ = file->stats.sync_cnt - file->stats.sync_failed;
 		float sync_ratio = sync_succ / (float) file->stats.sync_cnt;
 		printf("esp32_Close: IO-STATS '%s'\n"
-					 "  syncs      = %0.2f %% %lu / %luT - %lld us (avg: %lld us)\n"
-					 "  writes     = %0.2f %% %lu / %luT - %lld us (avg: %lld us)\n"
-					 "  reads      = %0.2f %% %lu / %luT - %lld us (avg: %lld us)\n"
-					 "  W Bytes    = Tot: %lu B (min: %lu, max: %lu)\n"
-					 "  R Bytes    = Tot: %lu B (min: %lu, max: %lu)\n",
+					 "  syncs      = %6.2f %% %4lu F / %4lu T - %9lld us (avg: %6lld us)\n"
+					 "  writes     = %6.2f %% %4lu F / %4lu T - %9lld us (avg: %6lld us)\n"
+					 "  reads      = %6.2f %% %4lu F / %4lu T - %9lld us (avg: %6lld us)\n"
+					 "  W Bytes    = Tot: %9lu B (min: %4lu, max: %4lu)\n"
+					 "  R Bytes    = Tot: %9lu B (min: %4lu, max: %4lu)\n",
 					 file->name,
 					 sync_ratio, sync_succ,  file->stats.sync_cnt,       file->stats.sync_elapsed_us, (file->stats.sync_elapsed_us / file->stats.sync_cnt),
 					 wrt_ratio,  wrt_succ,   file->stats.wrt_cnt,        file->stats.wrt_elapsed_us,  (file->stats.wrt_elapsed_us / file->stats.wrt_cnt),
@@ -470,10 +470,10 @@ int esp32_Read(sqlite3_file *id, void *buffer, int amount, sqlite3_int64 offset)
 
 	iofst = (int32_t)(offset & 0x7FFFFFFF);
 
-	dbg_printf("esp32_Read: 1r %s %d %lld[%d] \n", file->name, amount, offset, iofst);
+	dbg_printf("esp32_Read: 1r %s %d %lld[%ld] \n", file->name, amount, offset, iofst);
 	ofst = fseek(file->fd, iofst, SEEK_SET);
 	if (ofst != 0) {
-	    dbg_printf("esp32_Read: 2r %d != %d FAIL\n", ofst, iofst);
+	    dbg_printf("esp32_Read: 2r %ld != %ld FAIL\n", ofst, iofst);
 		memset(buffer, 0, amount);
 		return SQLITE_IOERR_SHORT_READ /* SQLITE_IOERR_SEEK */;
 	}
@@ -500,7 +500,7 @@ int esp32_Write(sqlite3_file *id, const void *buffer, int amount, sqlite3_int64 
 
 	iofst = (int32_t)(offset & 0x7FFFFFFF);
 
-	dbg_printf("esp32_Write: 1w %s %d %lld[%d] \n", file->name, amount, offset, iofst);
+	dbg_printf("esp32_Write: 1w %s %d %lld[%ld] \n", file->name, amount, offset, iofst);
 	ofst = fseek(file->fd, iofst, SEEK_SET);
 	if (ofst != 0) {
 		return SQLITE_IOERR_SEEK;
