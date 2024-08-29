@@ -88,11 +88,12 @@
 #define SQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS 1
 #define SQLITE_ENABLE_NULL_TRIM              1
 #define SQLITE_DQS                           0
-#define SQLITE_DEFAULT_SYNCHRONOUS           1 // 2 => 1 slightly less safe, but should be enough together with WAL.
+#define SQLITE_DEFAULT_SYNCHRONOUS           2
 
 // ESP32 Specific configuration for SQLite.
 // Under an ARCHDEFINE to be able to compile
 // on different archs (unix) to make testing easier.
 #ifdef ESP32
   #define SQLITE_OS_OTHER                    1
+  #define SQLITE_OMIT_WAL                    1
 #endif // ESP32
