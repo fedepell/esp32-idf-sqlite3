@@ -344,17 +344,6 @@ void filecache_free (pFileCache_t cache) {
 	}
 }
 
-int esp32mem_Close(sqlite3_file *id)
-{
-	esp32_file *file = (esp32_file*) id;
-
-	filecache_free(file->cache);
-	sqlite3_free (file->cache);
-
-	dbg_printf("esp32mem_Close: %s OK\n", file->name);
-	return SQLITE_OK;
-}
-
 int esp32mem_Read(sqlite3_file *id, void *buffer, int amount, sqlite3_int64 offset)
 {
 	int32_t ofst;
@@ -447,14 +436,15 @@ int esp32_Close(sqlite3_file *id)
 {
 	esp32_file *file = (esp32_file*) id;
 
-	int rc = fclose(file->fd);
+	// Journal file doesn't have a file descriptor opened
+	int rc = file->fd ? fclose(file->fd) : SQLITE_OK;
 	dbg_printf("esp32_Close: %s %d\n", file->name, rc);
 
-	#ifdef DEBUG_IO_STATS
-		uint32_t wrt_succ = file->stats.wrt_cnt - file->stats.wrt_failed;
-		float wrt_ratio = wrt_succ * 100 / (float) file->stats.wrt_cnt;
-
-		uint32_t read_succ = file->stats.read_cnt - file->stats.read_failed;
+	if (file->cache) {
+		dbg_printf("esp32_Close: Freeing cache\n");
+		filecache_free(file->cache);
+		sqlite3_free (file->cache);
+	}
 		float read_ratio = read_succ * 100 / (float) file->stats.read_cnt;
 
 		uint32_t sync_succ = file->stats.sync_cnt - file->stats.sync_failed;
