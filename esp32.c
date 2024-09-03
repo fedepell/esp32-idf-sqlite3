@@ -87,7 +87,7 @@ typedef struct esp32_file {
 	sqlite3_file base;
 	FILE *fd;
 	filecache_t *cache;
-	char name[esp32_DEFAULT_MAXNAMESIZE];
+	const char *name;
 
 	#ifdef DEBUG_IO_STATS
 		struct {
@@ -414,8 +414,7 @@ int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int f
 	dbg_printf("esp32_Open: 1o %s %s\n", path, mode);
 	memset (p, 0, sizeof(esp32_file));
 
-    strncpy (p->name, path, esp32_DEFAULT_MAXNAMESIZE);
-	p->name[esp32_DEFAULT_MAXNAMESIZE-1] = '\0';
+	p->name = path;
 
 	if( flags&SQLITE_OPEN_MAIN_JOURNAL ) {
 		p->fd = 0;
@@ -490,6 +489,7 @@ int esp32_Close(sqlite3_file *id)
 					);
 	#endif // DEBUG_IO_STATS
 
+	file->name = NULL;
 	return rc ? SQLITE_IOERR_CLOSE : SQLITE_OK;
 }
 
