@@ -193,9 +193,9 @@ const sqlite3_io_methods esp32IoMethods = {
 	.xFileSize                = esp32_FileSize,
 	.xSectorSize              = esp32_SectorSize,
 	.xDeviceCharacteristics   = esp32_DeviceCharacteristics,
+	.xTruncate                = esp32_Truncate,
 
 	// Dummy calls
-	.xTruncate                = dummy_sqlite_call,
 	.xLock                    = dummy_sqlite_call,
 	.xUnlock                  = dummy_sqlite_call,
 	.xCheckReservedLock       = dummy_sqlite_call,

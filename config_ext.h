@@ -69,7 +69,6 @@
 #define SQLITE_OMIT_TEMPDB                   1
 #define SQLITE_OMIT_TRACE                    1
 #undef SQLITE_OMIT_TRIGGER
-#define SQLITE_OMIT_TRUNCATE_OPTIMIZATION    1
 #define SQLITE_OMIT_UTF16                    1
 #undef SQLITE_OMIT_VACUUM
 #undef SQLITE_OMIT_VIEW
