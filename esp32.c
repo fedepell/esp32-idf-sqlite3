@@ -451,24 +451,24 @@ int esp32_Close(sqlite3_file *id)
 
 	#ifdef DEBUG_IO_STATS
 		printf("esp32_Close: IO-STATS '%s'\n"
-			     "| Operation | S Ratio  | Succ | Total | Elapsed Time   | Avg Time   | Avg Speed      | Tot Bytes   | B Min  | B Max  |\n",
+			     "| Operation | S Ratio  | Succ | Total | Elapsed Time   | Avg Time   | Avg Speed KB/s | Tot Bytes   | B Min  | B Max  |\n",
 			     file->name
 			     );
 		for (int i = 0; i < STATS_FCALL_MAX; i++) {
 
 			uint32_t succ = file->stats[i].count - file->stats[i].failed;
 			uint32_t avg  = (file->stats[i].count > 0) ? (file->stats[i].elapsed_us / file->stats[i].count) : 0;
-			float speed   = (file->stats[i].elapsed_us > 0) ? (file->stats[i].bytes / (file->stats[i].elapsed_us / 1e6)) : 0;
+			float speed_k = (file->stats[i].elapsed_us > 0) ? (((float)file->stats[i].bytes / 1024) / (file->stats[i].elapsed_us / 1e6)) : 0;
 			float ratio   = (file->stats[i].count > 0) ? (succ * 100 / (float) file->stats[i].count) : 0;
 
-			printf("| %9s | %6.2f %% | %4lu | %5lu | %11lld us | %7lu us | %10.0f B/s | %9lu B | %4lu B | %4lu B |\n",
+			printf("| %9s | %6.2f %% | %4lu | %5lu | %11lld us | %7lu us | %9.0f KB/s | %9lu B | %4lu B | %4lu B |\n",
 						 stats_fcall_names[i],
 				     ratio,
 				     succ,
 				     file->stats[i].count,
 				     file->stats[i].elapsed_us,
 				     avg,
-				     speed,
+				     speed_k,
 				     file->stats[i].bytes,
 				     file->stats[i].bytes_min,
 				     file->stats[i].bytes_max
