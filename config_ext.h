@@ -49,7 +49,6 @@
 #define SQLITE_OMIT_DECLTYPE                 1
 #define SQLITE_OMIT_DEPRECATED               1
 #define SQLITE_OMIT_EXPLAIN                  1
-#define SQLITE_OMIT_FLAG_PRAGMAS             1
 #define SQLITE_OMIT_FOREIGN_KEY              1
 #define SQLITE_OMIT_GET_TABLE                1
 #define SQLITE_OMIT_INCRBLOB                 1
@@ -60,14 +59,10 @@
 #define SQLITE_OMIT_LOOKASIDE                1
 #define SQLITE_OMIT_MEMORYDB                 1
 #undef SQLITE_OMIT_OR_OPTIMIZATION
-// #undef SQLITE_OMIT_PAGER_PRAGMAS
 #define SQLITE_OMIT_PARSER_TRACE             1
-// #undef SQLITE_OMIT_PRAGMA
 #define SQLITE_OMIT_PROGRESS_CALLBACK        1
 #define SQLITE_OMIT_QUICKBALANCE             1
 #undef SQLITE_OMIT_REINDEX
-// #define SQLITE_OMIT_SCHEMA_PRAGMAS           1
-// #define SQLITE_OMIT_SCHEMA_VERSION_PRAGMAS   1
 #define SQLITE_OMIT_SHARED_CACHE             1
 #define SQLITE_OMIT_TCL_VARIABLE             1
 #define SQLITE_OMIT_TEMPDB                   1
@@ -85,7 +80,6 @@
 /* #define SQLITE_OMIT_FLOATING_POINT        1 */
 
 #define SQLITE_OMIT_JSON                     1
-#define SQLITE_OMIT_INTROSPECTION_PRAGMAS    1
 #define SQLITE_OMIT_COMPLETE                 1
 #define SQLITE_OMIT_DESERIALIZE              1
 #define SQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS 1
