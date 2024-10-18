@@ -98,6 +98,7 @@
 // Under an ARCHDEFINE to be able to compile
 // on different archs (unix) to make testing easier.
 #ifdef ESP32
+  #define SQLITE_4_BYTE_ALIGNED_MALLOC       1
   #define SQLITE_OS_OTHER                    1
   #define SQLITE_OMIT_COMPILEOPTION_DIAGS    1
 #endif // ESP32
