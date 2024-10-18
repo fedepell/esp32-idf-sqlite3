@@ -24,8 +24,7 @@
 #define SQLITE_DEFAULT_FOREIGN_KEYS          0
 #define SQLITE_DEFAULT_MEMSTATUS             0
 #define SQLITE_DEFAULT_MMAP_SIZE             0
-#define SQLITE_DEFAULT_LOCKING_MODE          1
-#define SQLITE_DEFAULT_LOOKASIDE       512,128
+#define SQLITE_DEFAULT_LOCKING_MODE          1 // EXCLUSIVE Allows WAL also on non-shm system
 #define SQLITE_DEFAULT_PAGE_SIZE           512
 #define SQLITE_DEFAULT_PCACHE_INITSZ         8
 #define SQLITE_MAX_DEFAULT_PAGE_SIZE     32768
@@ -92,7 +91,7 @@
 #define SQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS 1
 #define SQLITE_ENABLE_NULL_TRIM              1
 #define SQLITE_DQS                           0
-#define SQLITE_DEFAULT_SYNCHRONOUS           2
+#define SQLITE_DEFAULT_SYNCHRONOUS            1 // Without WAL better 2
 #define SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT    65536
 
 // ESP32 Specific configuration for SQLite.
