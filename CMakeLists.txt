@@ -20,7 +20,6 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -MMD
     -c
     -DESP32
-    -DNDEBUG
   )
 
     # =============================

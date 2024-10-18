@@ -1,12 +1,19 @@
+// ==================
+// DEBUG OPTIONS
+// ==================
+// Production
+#undef SQLITE_DEBUG
+#define NDEBUG
+// DEBUG ONLY
+// #undef NDEBUG
+// #define SQLITE_DEBUG 1
+// ==================
+
 #define BUILD_sqlite -DNDEBUG
 #define SQLITE_CORE                          1
-#define SQLITE_NO_SYNC                       1
 #define YYSTACKDEPTH                        20
-#define SQLITE_TEMP_STORE                    3 // 1 => 3 only use memory
-#define SQLITE_SYSTEM_MALLOC                 1
 #define SQLITE_THREADSAFE                    0
 #define SQLITE_MUTEX_APPDEF                  1
-#define SQLITE_SECURE_DELETE                 0
 #define SQLITE_SMALL_STACK                   1
 #define SQLITE_DISABLE_LFS                   1
 #define SQLITE_DISABLE_DIRSYNC               1
@@ -22,7 +29,7 @@
 #define SQLITE_DEFAULT_PAGE_SIZE           512
 #define SQLITE_DEFAULT_PCACHE_INITSZ         8
 #define SQLITE_MAX_DEFAULT_PAGE_SIZE     32768
-#define SQLITE_POWERSAFE_OVERWRITE           1
+#define SQLITE_POWERSAFE_OVERWRITE           0
 #define SQLITE_SORTER_PMASZ                  4
 #define SQLITE_MAX_EXPR_DEPTH                0
 #undef SQLITE_OMIT_ALTERTABLE
@@ -36,14 +43,12 @@
 #define SQLITE_OMIT_AUTOVACUUM               1
 #undef SQLITE_OMIT_BETWEEN_OPTIMIZATION
 #define SQLITE_OMIT_BLOB_LITERAL             1
-#define SQLITE_UNTESTABLE                    1
 #define SQLITE_OMIT_CHECK                    1
 #define SQLITE_OMIT_COMPILEOPTION_DIAGS      1
 #define SQLITE_OMIT_CONFLICT_CLAUSE          1
 #undef SQLITE_OMIT_CTE
 #define SQLITE_OMIT_DECLTYPE                 1
 #define SQLITE_OMIT_DEPRECATED               1
-#undef SQLITE_OMIT_DISKIO
 #define SQLITE_OMIT_EXPLAIN                  1
 #define SQLITE_OMIT_FLAG_PRAGMAS             1
 #define SQLITE_OMIT_FOREIGN_KEY              1
@@ -54,16 +59,16 @@
 #define SQLITE_OMIT_LOAD_EXTENSION           1
 #undef SQLITE_OMIT_LOCALTIME
 #define SQLITE_OMIT_LOOKASIDE                1
-#undef SQLITE_OMIT_MEMORYDB
+#define SQLITE_OMIT_MEMORYDB                 1
 #undef SQLITE_OMIT_OR_OPTIMIZATION
-#undef SQLITE_OMIT_PAGER_PRAGMAS
+// #undef SQLITE_OMIT_PAGER_PRAGMAS
 #define SQLITE_OMIT_PARSER_TRACE             1
-#undef SQLITE_OMIT_PRAGMA
+// #undef SQLITE_OMIT_PRAGMA
 #define SQLITE_OMIT_PROGRESS_CALLBACK        1
 #define SQLITE_OMIT_QUICKBALANCE             1
 #undef SQLITE_OMIT_REINDEX
-#define SQLITE_OMIT_SCHEMA_PRAGMAS           1
-#define SQLITE_OMIT_SCHEMA_VERSION_PRAGMAS   1
+// #define SQLITE_OMIT_SCHEMA_PRAGMAS           1
+// #define SQLITE_OMIT_SCHEMA_VERSION_PRAGMAS   1
 #define SQLITE_OMIT_SHARED_CACHE             1
 #define SQLITE_OMIT_TCL_VARIABLE             1
 #define SQLITE_OMIT_TEMPDB                   1
@@ -88,11 +93,12 @@
 #define SQLITE_ENABLE_NULL_TRIM              1
 #define SQLITE_DQS                           0
 #define SQLITE_DEFAULT_SYNCHRONOUS           2
+#define SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT    65536
 
 // ESP32 Specific configuration for SQLite.
 // Under an ARCHDEFINE to be able to compile
 // on different archs (unix) to make testing easier.
 #ifdef ESP32
   #define SQLITE_OS_OTHER                    1
-  #define SQLITE_OMIT_WAL                    1
+  #define SQLITE_OMIT_COMPILEOPTION_DIAGS    1
 #endif // ESP32
