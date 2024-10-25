@@ -1,12 +1,14 @@
 // ==================
 // DEBUG OPTIONS
 // ==================
-// Production
-#undef SQLITE_DEBUG
-#define NDEBUG
-// DEBUG ONLY
-// #undef NDEBUG
-// #define SQLITE_DEBUG 1
+#if defined(NDEBUG)
+  #undef SQLITE_DEBUG
+  #undef SQLITE_TEST
+  #define SQLITE_OMIT_EXPLAIN                1
+#else
+  #define SQLITE_DEBUG                       1
+  #define SQLITE_TEST                        1
+#endif // NDEBUG
 // ==================
 
 #define BUILD_sqlite -DNDEBUG
