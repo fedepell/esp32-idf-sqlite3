@@ -25,6 +25,7 @@
 #include <esp_random.h>
 #include <rom/ets_sys.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #undef dbg_printf
 //#define dbg_printf(...) printf(__VA_ARGS__)
@@ -400,7 +401,7 @@ int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int f
 	if ( path == NULL ) return SQLITE_IOERR;
 	dbg_printf("esp32_Open: 0o %s %s\n", path, mode);
 
-	if( flags&SQLITE_OPEN_READWRITE || flags&SQLITE_OPEN_MAIN_JOURNAL ) {
+	if (!(flags & SQLITE_OPEN_READONLY)) {
 		int result;
 		if (SQLITE_OK != esp32_Access(vfs, path, flags, &result))
 			return SQLITE_CANTOPEN;
@@ -413,7 +414,11 @@ int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int f
 
 	p->name = path;
 
-	if( flags&SQLITE_OPEN_MAIN_JOURNAL ) {
+	/**
+	 * @todo COMMENTING OUT THIS CUSTOMIZATION WE GET RID OF THE WHOLE IN-MEMORY CACHING.
+	 *       CHOSE WHAT TO DO: LEAVE IT AS IS, OR REMOVE IT ENTIRELY.
+	 *
+	if (flags & (SQLITE_OPEN_MAIN_JOURNAL | SQLITE_OPEN_WAL | SQLITE_OPEN_MEMORY | SQLITE_OPEN_TEMP_DB | SQLITE_OPEN_TRANSIENT_DB | SQLITE_OPEN_TEMP_JOURNAL)) {
 		p->fd = 0;
 		p->cache = (filecache_t *) sqlite3_malloc(sizeof (filecache_t));
 		if (! p->cache )
@@ -424,9 +429,11 @@ int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int f
 		dbg_printf("esp32_Open: 2o %s MEM OK\n", p->name);
 		return SQLITE_OK;
 	}
+	*/
 
 	p->fd = fopen(path, mode);
 	if (!p->fd) {
+		dbg_printf("esp32_Open: 2o %s FAIL %s\n", p->name, strerror(errno));
 		return SQLITE_CANTOPEN;
 	}
 
@@ -539,12 +546,12 @@ int esp32_Truncate(sqlite3_file *id, sqlite3_int64 bytes)
 	esp32_file *file = (esp32_file*) id;
 
 	int fno = fileno(file->fd);
-	if (fno == -1)
+	if (fno == -1 || ftruncate(fno, 0) != 0) {
+		dbg_printf("esp32_Truncate: FAILED %s\n", file->name);
 		return SQLITE_IOERR_TRUNCATE;
-	if (ftruncate(fno, 0))
-		return SQLITE_IOERR_TRUNCATE;
+	}
 
-	dbg_printf("esp32_Truncate:\n");
+	dbg_printf("esp32_Truncate: %s\n", file->name);
 	return SQLITE_OK;
 }
 
