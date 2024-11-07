@@ -132,7 +132,7 @@ typedef struct esp32_file {
 		file->stats[stat_idx].count++; \
 		if (amount) { \
 			if (amount > file->stats[stat_idx].bytes_max) file->stats[stat_idx].bytes_max = amount; \
-			if (amount < file->stats[stat_idx].bytes_min) file->stats[stat_idx].bytes_min = amount; \
+			if (amount < file->stats[stat_idx].bytes_min || file->stats[stat_idx].bytes_min == 0) file->stats[stat_idx].bytes_min = amount; \
 		} \
 		if (rc == SQLITE_OK) { \
 			file->stats[stat_idx].bytes += amount; \
