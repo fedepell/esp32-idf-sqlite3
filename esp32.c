@@ -45,10 +45,6 @@ int esp32_Access(sqlite3_vfs*, const char*, int, int*);
 int esp32_FullPathname( sqlite3_vfs*, const char *, int, char*);
 int esp32_SectorSize(sqlite3_file*);
 int esp32_DeviceCharacteristics(sqlite3_file*);
-void* esp32_DlOpen(sqlite3_vfs*, const char *);
-void esp32_DlError(sqlite3_vfs*, int, char*);
-void (*esp32_DlSym (sqlite3_vfs*, void*, const char*))(void);
-void esp32_DlClose(sqlite3_vfs*, void*);
 int esp32_Randomness(sqlite3_vfs*, int, char*);
 int esp32_Sleep(sqlite3_vfs*, int);
 int esp32_CurrentTime(sqlite3_vfs*, double*);
@@ -170,10 +166,6 @@ sqlite3_vfs  esp32Vfs = {
 	.xDelete           = esp32_Delete,
 	.xAccess           = esp32_Access,
 	.xFullPathname     = esp32_FullPathname,
-	.xDlOpen           = esp32_DlOpen,
-	.xDlError          = esp32_DlError,
-	.xDlSym            = esp32_DlSym,
-	.xDlClose          = esp32_DlClose,
 	.xRandomness       = esp32_Randomness,
 	.xSleep            = esp32_Sleep,
 	.xCurrentTime      = esp32_CurrentTime,
@@ -637,31 +629,14 @@ int esp32_SectorSize(sqlite3_file *id)
 int esp32_DeviceCharacteristics(sqlite3_file *id)
 {
 	dbg_printf("esp32_DeviceCharacteristics:\n");
-	return 0;
-}
 
-void * esp32_DlOpen( sqlite3_vfs * vfs, const char * path )
-{
-	dbg_printf("esp32_DlOpen:\n");
-	return NULL;
-}
-
-void esp32_DlError( sqlite3_vfs * vfs, int len, char * errmsg )
-{
-	dbg_printf("esp32_DlError:\n");
-	return;
-}
-
-void ( * esp32_DlSym ( sqlite3_vfs * vfs, void * handle, const char * symbol ) ) ( void )
-{
-	dbg_printf("esp32_DlSym:\n");
-	return NULL;
-}
-
-void esp32_DlClose( sqlite3_vfs * vfs, void * handle )
-{
-	dbg_printf("esp32_DlClose:\n");
-	return;
+	// This is taken from the UNIX "tmp" fs in sqlite3
+	int device_characteristics =
+    SQLITE_IOCAP_ATOMIC      |   /* All ram filesystem writes are atomic */
+    SQLITE_IOCAP_SAFE_APPEND |   /* growing the file does not occur until the write succeeds */
+    SQLITE_IOCAP_SEQUENTIAL  |   /* The ram filesystem has no write behindso it is ordered */
+    0;
+	return device_characteristics;
 }
 
 int esp32_Randomness( sqlite3_vfs * vfs, int len, char * buffer )
