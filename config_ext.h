@@ -5,6 +5,7 @@
   #undef SQLITE_DEBUG
   #undef SQLITE_TEST
   #define SQLITE_OMIT_EXPLAIN                1
+  #define SQLITE_OMIT_COMPILEOPTION_DIAGS    1
 #else
   #define SQLITE_DEBUG                       1
   #define SQLITE_TEST                        1
@@ -24,7 +25,7 @@
 #define SQLITE_DEFAULT_MEMSTATUS             0
 #define SQLITE_DEFAULT_MMAP_SIZE             0
 #define SQLITE_DEFAULT_LOCKING_MODE          1 // EXCLUSIVE Allows WAL also on non-shm system
-#define SQLITE_DEFAULT_PAGE_SIZE           512
+#define SQLITE_DEFAULT_PAGE_SIZE          4096
 #define SQLITE_DEFAULT_PCACHE_INITSZ         4
 #define SQLITE_MAX_DEFAULT_PAGE_SIZE      4096
 #define SQLITE_POWERSAFE_OVERWRITE           0
@@ -38,7 +39,6 @@
 #define SQLITE_OMIT_BETWEEN_OPTIMIZATION     1
 #define SQLITE_OMIT_BLOB_LITERAL             1
 #define SQLITE_OMIT_CHECK                    1
-#define SQLITE_OMIT_DECLTYPE                 1
 #define SQLITE_OMIT_DEPRECATED               1
 #define SQLITE_OMIT_FOREIGN_KEY              1
 #define SQLITE_OMIT_GET_TABLE                1
@@ -48,7 +48,6 @@
 #define SQLITE_OMIT_LOAD_EXTENSION           1
 #define SQLITE_OMIT_LOCALTIME                1
 #define SQLITE_OMIT_LOOKASIDE                1
-#define SQLITE_OMIT_MEMORYDB                 1
 #define SQLITE_OMIT_PROGRESS_CALLBACK        1
 #define SQLITE_OMIT_QUICKBALANCE             1
 #define SQLITE_OMIT_SHARED_CACHE             1
@@ -57,8 +56,6 @@
 #define SQLITE_OMIT_TRACE                    1
 #define SQLITE_OMIT_UTF16                    1
 #define SQLITE_OMIT_XFER_OPT                 1
-#define SQLITE_OMIT_SCHEMA_VERSION_PRAGMAS   1
-#define SQLITE_OMIT_TRUNCATE_OPTIMIZATION    1
 
 #define SQLITE_HAVE_ISNAN                    1
 #define SQLITE_STRICT_SUBTYPE                1
@@ -71,6 +68,8 @@
 #define SQLITE_DEFAULT_SYNCHRONOUS           1 // Without WAL better 2
 #define SQLITE_DEFAULT_WAL_SYNCHRONOUS       1
 #define SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT    65536
+#define SQLITE_ENABLE_SNAPSHOT               1
+#define SQLITE_DEFAULT_WAL_AUTOCHECKPOINT    100
 
 // ESP32 Specific configuration for SQLite.
 // Under an ARCHDEFINE to be able to compile
@@ -79,5 +78,4 @@
   // #define SQLITE_ENABLE_8_3_NAMES              2 ///< Some FS like fat without long names can't handle normal '-journal' names
   #define SQLITE_4_BYTE_ALIGNED_MALLOC       1
   #define SQLITE_OS_OTHER                    1
-  #define SQLITE_OMIT_COMPILEOPTION_DIAGS    1
 #endif // ESP32

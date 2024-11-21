@@ -11,7 +11,7 @@
  * Define this to enable some basic I/O statistics.
  * Useful for debugging only, do not use in production.
  */
-#define DEBUG_IO_STATS
+// #define DEBUG_IO_STATS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,17 +21,15 @@
 #include <unistd.h>
 #include <sqlite3.h>
 #include <spi_flash_mmap.h>
-#include <esp_system.h>
 #include <esp_random.h>
-#include <rom/ets_sys.h>
 #include <sys/stat.h>
 #include <errno.h>
 
 #undef dbg_printf
 //#define dbg_printf(...) printf(__VA_ARGS__)
 #define dbg_printf(...) 
-#define CACHEBLOCKSZ 64
-#define esp32_DEFAULT_MAXNAMESIZE 64
+#define CACHEBLOCKSZ 		4096
+#define MAX_FNAME_LEN     32
 
 int esp32_Close(sqlite3_file*);
 int esp32_Sync(sqlite3_file*, int);
@@ -159,7 +157,7 @@ int esp32mem_Write_Stats(sqlite3_file* id, const void* buffer, int amount, sqlit
 sqlite3_vfs  esp32Vfs = {
 	.iVersion          = 1,
 	.szOsFile          = sizeof(esp32_file),
-	.mxPathname        = esp32_DEFAULT_MAXNAMESIZE,
+	.mxPathname        = MAX_FNAME_LEN,
 	.pNext             = NULL,
 	.zName             = "esp32",
 	.xOpen             = esp32_Open,
@@ -407,9 +405,12 @@ int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int f
 	p->name = path;
 
 	/**
-	 * @todo COMMENTING OUT THIS CUSTOMIZATION WE GET RID OF THE WHOLE IN-MEMORY CACHING.
-	 *       CHOSE WHAT TO DO: LEAVE IT AS IS, OR REMOVE IT ENTIRELY.
-	 *
+	 * In-memory optimization for temporary DBs and journal.
+	 * Leaving this optimizataion as it gives a nice boost at sqlite "application" performance.
+	 * In simple insert with transanctions it gives some sensible speedups (with empty partitions!):
+	 *   - SPIFFS: 6   KB/S => 38  KB/S
+	 *   - FATFS:  3.5 KB/S => 5.6 KB/S
+	 **/
 	if (flags & (SQLITE_OPEN_MAIN_JOURNAL | SQLITE_OPEN_WAL | SQLITE_OPEN_MEMORY | SQLITE_OPEN_TEMP_DB | SQLITE_OPEN_TRANSIENT_DB | SQLITE_OPEN_TEMP_JOURNAL)) {
 		p->fd = 0;
 		p->cache = (filecache_t *) sqlite3_malloc(sizeof (filecache_t));
@@ -421,7 +422,6 @@ int esp32_Open( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int f
 		dbg_printf("esp32_Open: 2o %s MEM OK\n", p->name);
 		return SQLITE_OK;
 	}
-	*/
 
 	p->fd = fopen(path, mode);
 	if (!p->fd) {
@@ -622,8 +622,9 @@ int esp32_FullPathname( sqlite3_vfs * vfs, const char * path, int len, char * fu
 
 int esp32_SectorSize(sqlite3_file *id)
 {
-	dbg_printf("esp32_SectorSize:\n");
-	return SPI_FLASH_SEC_SIZE;
+	int sz = SPI_FLASH_SEC_SIZE;
+	dbg_printf("esp32_SectorSize: %d\n", sz);
+	return sz;
 }
 
 int esp32_DeviceCharacteristics(sqlite3_file *id)
@@ -655,18 +656,14 @@ int esp32_Randomness( sqlite3_vfs * vfs, int len, char * buffer )
 
 int esp32_Sleep( sqlite3_vfs * vfs, int microseconds )
 {
-	ets_delay_us(microseconds);
+	usleep(microseconds);
 	dbg_printf("esp32_Sleep:\n");
 	return SQLITE_OK;
 }
 
 int esp32_CurrentTime( sqlite3_vfs * vfs, double * result )
 {
-	time_t t = time(NULL);
-	*result = t / 86400.0 + 2440587.5;
-	// This is stubbed out until we have a working RTCTIME solution;
-	// as it stood, this would always have returned the UNIX epoch.
-	//*result = 2440587.5;
+	*result = (double)time(NULL);
 	dbg_printf("esp32_CurrentTime: %g\n", *result);
 	return SQLITE_OK;
 }
