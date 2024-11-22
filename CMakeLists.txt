@@ -21,14 +21,3 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -c
     -DESP32
   )
-
-    # =============================
-    # @TODO  Double check these
-    # eventually remove or restore
-    # before merging!!
-    # =============================
-
-    # -fno-stack-protector
-    # -fstrict-volatile-bitfields
-    # -mlongcalls
-    # -nostdlib
