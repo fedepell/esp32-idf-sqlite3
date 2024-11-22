@@ -1,6 +1,25 @@
 SQLite3 library
 ===============
 
+Fork Status
+-----------
+
+This fork is a work in progress and is not yet ready for use. Currently testing on ESP32-S3-WROOM-1U with 8MB.
+Currently there are a few performance issues that need to be addressed, and the library is not yet fully functional.
+
+Notably missing is the WAL support, also performance and stability is tighly related to the FS used, currently tested are:
+- FATFS
+- SPIFFS
+- LittleFS
+
+LittleFS, while the most modern, is the slowest and most unstable, with the most issues.
+
+SPIFFS is the fastest but it's performance varies greatly.
+
+FATFS is not as fast as SPIFFS but it's performance are more stable.
+
+More details will be added as the project progresses.
+
 Overview
 --------
 
